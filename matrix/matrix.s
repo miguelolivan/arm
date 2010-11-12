@@ -19,7 +19,10 @@ Reset_Handler:
         LDR     r1, =b       /*  r1 = pointer to source matrix B */
         LDR     r2, =c        /*  r2 = pointer to dest. matrix */
         MOV     sp, #0x400      /*  set up stack pointer (r13) */ 
-        B multiply_arm
+        BL multiply_arm
+        ADR r3, multiply_th+1
+        BX r3
+
 .extern     multiply 
         ldr         r3, = multiply
         mov         lr, pc 
@@ -64,7 +67,51 @@ incr_index_res:
 		
 end_mult_arm:
 		LDMFD   sp!, {r0-r14}   /*don't need these now, restore the original registers*/
-		B stop
+		BX lr
+		
+.thumb /*indicates that we are using the thumb instruction set */
+
+multiply_th:
+# r4 -> index j
+# r3 -> index i
+		MOV r3, #lim
+
+th_new_column_b:
+		MOV r4, #lim
+		SUB r3, r3, #1
+		BEQ end_mult_th
+		#TODO: -> read row -> pop registers in order to gain room -> 	
+		#LDR   r5, [r1], #sizerow
+		# ->  value from A, value from B and multiply?
+		# ->  OR temp row 
+		#LDR   r6, [r1],#sizerow
+		#LDR   r7, [r1],#-sizerow2
+		#MOV   r14, r0
+		
+
+th_new_row_a:
+		SUB r4, r4, #1 
+		BEQ th_incr_index_res
+		#TODO: Cogiendo Columna
+		#r5-r7 -> row Matrix A
+		#r5-r7-> column Matrix B
+		#r12   -> result
+		#LDMIA   r14!, {r6-r8}	
+		
+		#MUL r12, r6, r9
+		#MLA r12, r7, r10, r12
+		#MLA r12, r8, r11, r12
+		##aumentando puntero a columnas
+		#STR   r12, [r2], #sizerow
+		B th_new_row_a
+
+th_incr_index_res:
+		SUB   r2, r2, #sizerow3
+		B th_new_column_b
+		
+end_mult_th:
+		B stop   /*don't need these now, restore the original registers*/
+
 
 .data
 .ltorg /*guarantees the alignment*/
