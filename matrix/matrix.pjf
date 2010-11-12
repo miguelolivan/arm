@@ -1,0 +1,80 @@
+# Embest IDE Project File, Format Version 1.00
+# WARNING: DO NOT EDIT OR DELETE THIS PROJECT FILE!
+
+<BEGIN> PROJECT_NAME
+ARMcode
+<END>
+
+<BEGIN> CONFIG
+
+	<BEGIN> CPU
+	MODULE=arm7.DLL
+	FAMILY=ARM7
+	FAMILYID=1
+	MEMBER=ARM7
+	MEMBERID=1
+	ENDIAN=0
+	<END>
+
+	<BEGIN> DEBUG
+	LINK=.\debug\matrix.elf
+	AUTODOWNLOAD=FALSE
+	AUTOSCRIPT=FALSE
+	VERIFY=TRUE
+	USEMEMMAP=FALSE
+	EXECFDOWN=TRUE
+	EXECFENTRY=FALSE
+	DOWNLOAD=C:\Proyectos\arm\matrix\debug\matrix.elf
+	SYMBOL=C:\Proyectos\arm\matrix\debug\matrix.elf
+	DOWNLOADADDR=0x0
+	<END>
+
+	<BEGIN> REMOTE
+	SPEED=0
+	DEVICE=SimArm7.DLL
+	COMMTYPE=PARALLEL
+	PARALLEL=LPT1
+	<END>
+
+	<BEGIN> DIR
+	SUBDIR=FALSE
+	<END>
+
+<END>
+
+<BEGIN> BUILD_CONFIG
+	CONFIG_DLL=GccArmSettingPage.dll
+	<BEGIN> COMPILE_COMMAND_LINE
+	-gdwarf-2 -c $(SOURCE_FILE) -o.\debug\$(OBJ_FILE)
+	<END>
+	<BEGIN> ASSEMBLE_COMMAND_LINE
+	$(SOURCE_FILE) -gdwarf2 -o.\debug\$(OBJ_FILE)
+	<END>
+	<BEGIN> LINK_COMMAND_LINE
+	arm-elf-ld -TC:\Proyectos\arm\matrix\ldscript -o.\debug\matrix.elf $(<matrix.o>OBJ_FILES)
+	<END>
+<END>
+
+<BEGIN> PROJECT_FILES
+
+	<BEGIN> GROUP="Project Source Files"
+		<PROP> GROUP_FILTER="*.c;*.cpp;*.cc;*.cxx;*.s;*.asm"
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\matrix.s
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\multiply.c
+		STATUS=CLOSE
+		<END>
+
+	<END>
+
+	<BEGIN> GROUP="Project Header Files"
+		<PROP> GROUP_FILTER="*.h;*.inl;*.mac;*.inc"
+
+	<END>
+
+<END>

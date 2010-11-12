@@ -1,0 +1,24 @@
+.global _start
+.text
+_start:
+.arm /* Subsequent instructions areARM*/
+header:
+ADR r0, Tstart + 1 /* Processor starts inARMstate, */
+BX r0 /* so smallARMcode header used */
+/* to call Thumb main program. */
+NOP
+.thumb
+Tstart:
+MOV r0, #10 /* Set up parameters */
+MOV r1, #3
+BL doadd /* Call subroutine */
+stop:
+B stop
+doadd:
+ADD r0, r0, r1 /* Subroutine code */
+MOV pc, lr /* Return fromsubroutine. */
+.end /* Mark
+	SUB r0, r1, r2
+	MOV pc, lr
+
+.end
