@@ -25,6 +25,7 @@ Reset_Handler:
         LDR     r2, =c        
         MOV     sp, #0x400      /*  set up stack pointer (r13) */ 
         BL multiply_arm
+        /*  r0 = pointer to source matrix A */
         LDR     r0, =a
         /*  r1 = pointer to source matrix B */
         LDR     r1, =b
@@ -33,13 +34,13 @@ Reset_Handler:
         adr		r14, return		/* we store the return address in r14*/
         BX r3
 return:
-.extern     multiply
-		/*  r2 = pointer to dest. matrix */
-		LDR     r0, =a
+.extern     c_multiply
+ 		LDR     r0, =a
         /*  r1 = pointer to source matrix B */
         LDR     r1, =b
+        /*  r2 = pointer to dest. matrix */
 		ldr     r2, =e        
-        ldr     r3, = multiply
+        ldr     r3, = c_multiply
         mov     lr, pc 
         bx          r3
 stop:
@@ -48,6 +49,7 @@ multiply_arm:
         STMFD   sp!, {r0-r14}   /*  saves the working registers */
 # r4 -> index j
 # r3 -> index i
+#r5,r6 -> unused
 		MOV r3, #lim
 
 new_column_b:
@@ -98,6 +100,7 @@ th_new_column_b:
 		MOV r4, #lim
 		SUB r3, r3, #1
 		BEQ end_mult_thr
+		#r5-r7-> column Matrix B
 		LDR   r5, [r1]
 		LDR   r6, [r1, #sizerow]
 		LDR   r7, [r1,#sizerow2]
@@ -107,9 +110,8 @@ th_new_row_a:
 		BEQ th_incr_index_res
 		PUSH {r1,r2,r3,r4}
 		#TODO: Cogiendo Columna
-		#r5-r7 -> row Matrix A
-		#r5-r7-> column Matrix B
-		#r12   -> result
+		#r1-r3 -> row Matrix A
+		#r4   -> result
 		LDMIA   r0!, {r1-r3}	
 		
 		MUL r1, r5
@@ -117,13 +119,11 @@ th_new_row_a:
 		MUL r3, r7
 		ADD r4, r1, r2
 		ADD r4, r3
-		#TODO: STORE IN R2!!!!!
 		POP {r1,r2,r3}
 		STR   r4, [r2]
 		ADD   r2, r2, #sizerow
 		POP {r4}
 		
-		#, #sizerow
 		B th_new_row_a
 
 th_incr_index_res:
@@ -140,8 +140,7 @@ end_mult_thr:
 a:
      .long     1,2,3,4,5,6,7,8,9
 b:
-     #.long     9,8,7,6,5,4,3,2,1
-     .long     1,0,0,0,1,0,0,0,1
+	.long     9,8,7,6,5,4,3,2,1
 c:
      .long     0,0,0,0,0,0,0,0,0
 d:
