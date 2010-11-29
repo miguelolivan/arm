@@ -45,21 +45,42 @@ return:
         bx          r3
 stop:
 		B		stop
+		
+/*
+	multiply_arm. Multiplica dos matrices 3x3 en código ARM
+	
+		parámetros:
+			r0 -> Puntero al comienzo del la matriz A
+			r1 -> Puntero al comienzo del la matriz B
+			r2 -> Puntero al comienzo del la matriz C (resutado)
+			
+		Además usa los registros del siguiente modo:
+			r3		-> contador de columnas de B
+			r4		-> contador de filas de A
+			r5		-> no se usa
+			r6-8	-> fila de A
+			r9-11	-> columna de C
+			r12		-> valor temporal de multiplicacion-acumulación
+			r13		-> no se usa
+			r14		-> no se usa
+			
+		Nota: para reducir el número de instrucciones en el bucle interno, se usa en él LDMIA,
+		con lo que se invierten los bucles usuales al recorrer una matriz y se escribe por columnas			
+
+*/		
 multiply_arm:
         STMFD   sp!, {r0-r14}   /*  saves the working registers */
-# r4 -> index j
 # r3 -> index i
-#r5,r6 -> unused
 		MOV r3, #lim
 
 new_column_b:
+# r4 -> index j
 		MOV r4, #lim
 		SUBS r3, r3, #1
 		BEQ end_mult_arm
 		LDR   r9, [r1], #sizerow
 		LDR   r10, [r1],#sizerow
 		LDR   r11, [r1],#-retcol
-		MOV   r14, r0
 		
 
 new_row_a:
@@ -69,17 +90,20 @@ new_row_a:
 		#r6-r8 -> row Matrix A
 		#r9-r11-> column Matrix B
 		#r12   -> result
-		LDMIA   r14!, {r6-r8}
+		LDMIA   r0!, {r6-r8}
 		
 		MUL r12, r6, r9
 		MLA r12, r7, r10, r12
 		MLA r12, r8, r11, r12
+		#guardando valor y
 		#aumentando puntero a columnas
 		STR   r12, [r2], #sizerow
 		B new_row_a
 
 incr_index_res:
+		#siguiente columna
 		SUB   r2, r2, #retcol2
+		SUB   r0, r0, #sizematrix
 		B new_column_b
 		
 end_mult_arm:
@@ -88,6 +112,28 @@ end_mult_arm:
 		
 .thumb /*indicates that we are using the thumb instruction set */
 
+/*
+	multiply_th. Multiplica dos matrices 3x3 en con el repertorio thumb
+	
+		parámetros:
+			r0 -> Puntero al comienzo del la matriz A
+			r1 -> Puntero al comienzo del la matriz B
+			r2 -> Puntero al comienzo del la matriz C (resutado)
+			
+		Además usa los registros del siguiente modo:
+			r3		-> contador de columnas de B
+			r4		-> contador de filas de B
+			r5-7	-> columna de B
+			
+			(Guardando contenidos en pila)
+			r1-3	-> fila de A
+			r4		-> valor temporal de multiplicacion-acumulación
+			
+		Nota: para reducir el número de instrucciones en el bucle interno, se usa en él LDMIA,
+		con lo que se invierten los bucles usuales al recorrer una matriz y se escribe por columnas
+			
+
+*/
 multiply_th:
 # r0 -> A
 # r1 -> B
@@ -140,7 +186,9 @@ end_mult_thr:
 a:
      .long     1,2,3,4,5,6,7,8,9
 b:
-	.long     9,8,7,6,5,4,3,2,1
+#	.long     9,8,7,6,5,4,3,2,1
+#	.long     1,2,3,4,5,6,7,8,9
+	.long     1,0,0,0,1,0,0,0,1
 c:
      .long     0,0,0,0,0,0,0,0,0
 d:
