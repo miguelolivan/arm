@@ -43,6 +43,16 @@ return:
         ldr     r3, = c_multiply
         mov     lr, pc 
         bx          r3
+
+.extern     multiply_n_arm
+ 		LDR     r0, =aprima
+        /*  r1 = pointer to source matrix B */
+        LDR     r1, =bprima
+        /*  r2 = pointer to dest. matrix */
+		ldr     r2, =f        
+        ldr     r3, = multiply_n_arm
+        mov     lr, pc 
+        bx          r3
 stop:
 		B		stop
 		
@@ -183,17 +193,29 @@ end_mult_thr:
 
 .data
 .ltorg /*guarantees the alignment*/
+
 a:
-     .long     1,2,3,4,5,6,7,8,9
+	.long     1,2,3,4,5,6,7,8,9
+
 b:
+#	.long     1,2,3,4,5,6,7,8,9
+	.long     1,0,0, 0,1,0 ,0,0,1
+	.long		
+
+aprima:
+     .long     1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+bprima:
 #	.long     9,8,7,6,5,4,3,2,1
 #	.long     1,2,3,4,5,6,7,8,9
-	.long     1,0,0,0,1,0,0,0,1
+	.long     1,0,0,0, 0,1,0,0 ,0,0,1,0 ,0,0,0,1
 c:
      .long     0,0,0,0,0,0,0,0,0
 d:
      .long     0,0,0,0,0,0,0,0,0
 e:
      .long     0,0,0,0,0,0,0,0,0
+f:
+     .long     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
 
 .end /* Mark*/

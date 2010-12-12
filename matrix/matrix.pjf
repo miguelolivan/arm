@@ -45,7 +45,7 @@ ARMcode
 <BEGIN> BUILD_CONFIG
 	CONFIG_DLL=GccArmSettingPage.dll
 	<BEGIN> COMPILE_COMMAND_LINE
-	-gdwarf-2 -c $(SOURCE_FILE) -o.\debug\$(OBJ_FILE)
+	-O2 -gdwarf-2 -c $(SOURCE_FILE) -o.\debug\$(OBJ_FILE)
 	<END>
 	<BEGIN> ASSEMBLE_COMMAND_LINE
 	$(SOURCE_FILE) -gdwarf2 -o.\debug\$(OBJ_FILE)
@@ -62,6 +62,11 @@ ARMcode
 
 		<BEGIN> SOURCE_FILE
 		SOURCE=.\matrix.s
+		STATUS=CLOSE
+		<END>
+
+		<BEGIN> SOURCE_FILE
+		SOURCE=.\matrix_n.s
 		STATUS=CLOSE
 		<END>
 
